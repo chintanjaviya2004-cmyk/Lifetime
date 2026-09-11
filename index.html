@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Lifetime — Your Life, Quantified</title>
+<meta name="description" content="A gamified countdown of your one life." />
+
+<meta name="theme-color" content="#0A0E14" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/favicon.ico" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Lifetime" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div id="bg-fx" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+
+<!-- Onboarding -->
+<div id="onboarding-screen" class="onboarding" hidden>
+  <div class="onboarding-card">
+    <p class="eyebrow">Calibration</p>
+    <h1>How much time do you have?</h1>
+    <p class="onboarding-copy">Choose your birthdate and the lifespan we'll chart against.</p>
+    <form id="onboarding-form" novalidate>
+      <label for="birthdate-input" class="field-label">Birthdate</label>
+      <input type="date" id="birthdate-input" name="birthdate" required />
+      <p id="onboarding-error" class="field-error" hidden></p>
+
+      <label class="field-label age-field-label">Life expectancy (years)</label>
+      <div class="age-chip-row" id="onboarding-age-chips" role="group" aria-label="Target lifespan in years">
+        <button type="button" class="age-chip selected" data-age="60">60</button>
+        <button type="button" class="age-chip" data-age="70">70</button>
+        <button type="button" class="age-chip" data-age="80">80</button>
+        <button type="button" class="age-chip" data-age="90">90</button>
+        <button type="button" class="age-chip age-chip-custom" data-age="custom">Custom</button>
+      </div>
+      <input type="number" id="onboarding-age-custom" class="age-custom-input" min="1" max="120" placeholder="Age in years" hidden />
+      <p id="onboarding-age-error" class="field-error" hidden></p>
+
+      <button type="submit" class="btn-primary">Begin</button>
+    </form>
+  </div>
+</div>
+
+<!-- Edit panel -->
+<div id="edit-screen" class="onboarding" hidden>
+  <div class="onboarding-card">
+    <p class="eyebrow">Settings</p>
+    <h1>Recalibrate</h1>
+    <form id="edit-form" novalidate>
+      <label for="edit-birthdate-input" class="field-label">Birthdate</label>
+      <input type="date" id="edit-birthdate-input" name="birthdate" required />
+      <p id="edit-error" class="field-error" hidden></p>
+
+      <label class="field-label age-field-label">Life expectancy (years)</label>
+      <div class="age-chip-row" id="edit-age-chips" role="group" aria-label="Target lifespan in years">
+        <button type="button" class="age-chip" data-age="60">60</button>
+        <button type="button" class="age-chip" data-age="70">70</button>
+        <button type="button" class="age-chip" data-age="80">80</button>
+        <button type="button" class="age-chip" data-age="90">90</button>
+        <button type="button" class="age-chip age-chip-custom" data-age="custom">Custom</button>
+      </div>
+      <input type="number" id="edit-age-custom" class="age-custom-input" min="1" max="120" placeholder="Age in years" hidden />
+      <p id="edit-age-error" class="field-error" hidden></p>
+
+      <div class="edit-actions">
+        <button type="submit" class="btn-primary">Save</button>
+        <button type="button" id="edit-cancel" class="btn-ghost">Cancel</button>
+      </div>
+
+      <div class="backup-actions">
+        <button type="button" id="export-data-btn" class="btn-ghost-sm">Export backup</button>
+        <button type="button" id="import-data-btn" class="btn-ghost-sm">Restore backup</button>
+        <input type="file" id="import-data-input" accept="application/json" hidden />
+      </div>
+
+      <button type="button" id="clear-data" class="btn-danger-link">Clear all data</button>
+    </form>
+  </div>
+</div>
+
+<!-- Main dashboard -->
+<main id="dashboard" hidden>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">LIFETIME</span>
+    </div>
+    <button id="edit-btn" class="icon-btn" aria-label="Edit birthdate" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    </button>
+  </header>
+
+  <section class="hero">
+    <div
+      class="ring-wrap"
+      role="progressbar"
+      aria-label="Percent of life lived"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      id="ring-wrap"
+    >
+      <svg class="ring-svg" viewBox="0 0 200 200" aria-hidden="true">
+        <circle class="ring-track" cx="100" cy="100" r="88" />
+        <circle
+          class="ring-progress"
+          id="ring-progress"
+          cx="100"
+          cy="100"
+          r="88"
+          stroke-dasharray="553"
+          stroke-dashoffset="553"
+        />
+        <circle class="ring-tick" cx="188" cy="100" r="2.5" />
+        <circle class="ring-tick" cx="100" cy="188" r="2.5" />
+        <circle class="ring-tick" cx="12" cy="100" r="2.5" />
+      </svg>
+      <div class="ring-center">
+        <p class="hero-label">LIFE LIVED</p>
+        <div class="hero-percent-row">
+          <span id="hero-percent" class="hero-percent">0.0</span><span class="hero-percent-sign">%</span>
+        </div>
+        <p id="rank-label" class="rank-label">—</p>
+      </div>
+    </div>
+
+    <p id="narrative-line" class="narrative-line">—</p>
+  </section>
+
+  <section class="stats-grid" aria-label="Life statistics">
+    <div class="stat-tile">
+      <span class="stat-icon-badge"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+      <p class="stat-label">Days Lived</p>
+      <p class="stat-value" id="stat-days-lived">0</p>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon-badge"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v3M18 3v3M4 8h16M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M9 13h6"/></svg></span>
+      <p class="stat-label">Days Left</p>
+      <p class="stat-value" id="stat-days-left">0</p>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon-badge"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>
+      <p class="stat-label">Weeks Left</p>
+      <p class="stat-value" id="stat-weeks-left">0</p>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon-badge"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><path d="M5 3 3 5m18-2 2 2"/><path d="M6.4 19.6a9 9 0 1 0 0-15.2"/><path d="M2 12h2m1.6 7.6L4 21m1.6-16.6L4 3"/></svg></span>
+      <p class="stat-label">Time Left</p>
+      <p class="stat-value stat-value-compact" id="stat-time-left">0</p>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon-badge"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8ZM16 12a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z"/></svg></span>
+      <p class="stat-label">% Lived</p>
+      <p class="stat-value" id="stat-percent">0%</p>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-icon-badge"><svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1Z"/></svg></span>
+      <p class="stat-label">Life Stage</p>
+      <p class="stat-value stat-value-small" id="stat-rank">—</p>
+    </div>
+  </section>
+
+  <section class="years-section">
+    <div class="section-title-row">
+      <p class="section-title">Life Grid</p>
+      <div class="grid-view-tabs" role="tablist" aria-label="Grid view">
+        <button type="button" class="grid-tab" id="tab-years" role="tab" aria-selected="true" aria-controls="years-grid">Years</button>
+        <button type="button" class="grid-tab" id="tab-weeks" role="tab" aria-selected="false" aria-controls="weeks-canvas">Weeks</button>
+      </div>
+      <p class="section-sub" id="grid-sub">0 / 60</p>
+    </div>
+    <div class="years-grid" id="years-grid"></div>
+    <canvas class="weeks-canvas" id="weeks-canvas" hidden></canvas>
+    <div class="years-legend">
+      <span><i class="legend-dot legend-dot-lived"></i>Lived</span>
+      <span><i class="legend-dot legend-dot-current"></i>Current</span>
+      <span><i class="legend-dot legend-dot-ahead"></i>Ahead</span>
+    </div>
+  </section>
+
+  <div id="install-banner" class="install-banner" hidden>
+    <p id="install-banner-text">Add Lifetime to your Home Screen for a one-tap glance.</p>
+    <div class="install-banner-actions">
+      <button id="install-btn" class="btn-primary-sm" type="button" hidden>Install</button>
+      <button id="install-dismiss" class="btn-ghost-sm" type="button">Got it</button>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <p id="footer-assumption">Assuming a 60-year life. Recalibrate anytime.</p>
+  </footer>
+</main>
+
+<div id="rank-up-toast" class="rank-up-toast" hidden role="status" aria-live="polite">
+  <div>
+    <p class="rank-up-eyebrow">Rank Up</p>
+    <p class="rank-up-title" id="rank-up-title">—</p>
+  </div>
+  <button type="button" id="rank-up-dismiss" class="rank-up-dismiss" aria-label="Dismiss">×</button>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

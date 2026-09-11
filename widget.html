@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lifetime Widget</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0A0E14;
+    --surface-elevated: #181D28;
+    --accent-dim: #1FA35C;
+    --accent: #39FF88;
+    --text: #F4F7F5;
+    --text-secondary: #8B98A5;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    background: var(--bg);
+    color: var(--text);
+  }
+  body.transparent-bg { background: transparent; }
+  .widget {
+    height: 100%;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+  }
+  .pct { font-weight: 700; font-size: clamp(28px, 12vw, 48px); line-height: 1; color: var(--accent); }
+  .label { font-size: 10px; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; }
+  .track { height: 8px; border-radius: 4px; background: var(--surface-elevated); overflow: hidden; margin: 4px 0; }
+  .fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); }
+  .days { font-size: 13px; color: var(--text); }
+  .rank { font-size: 10px; color: var(--text-secondary); }
+  .empty { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="widget" id="widget-root">
+  <p class="empty">Open the app to set your birthdate.</p>
+</div>
+<script type="module" src="widget.js"></script>
+</body>
+</html>
