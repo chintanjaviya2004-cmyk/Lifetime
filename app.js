@@ -212,7 +212,16 @@ function drawWeeksGrid(stats) {
   const gap = 2;
   const cols = 52;
   const rows = stats.targetAgeYears;
-  const containerWidth = canvas.parentElement.clientWidth;
+  // Measure the canvas's own available width, not its parent's clientWidth
+  // — the parent (.years-section) has its own left/right padding, which
+  // clientWidth includes. Sizing the canvas to that full padded width made
+  // it overflow the section's content box by the padding amount on each
+  // side, forcing the whole page into horizontal scroll. Clearing any
+  // previous inline width first lets the "width:100%" CSS rule (which
+  // correctly respects the parent's padding) determine the real available
+  // width before we measure it.
+  canvas.style.width = "100%";
+  const containerWidth = canvas.clientWidth;
   if (containerWidth <= 0) return;
 
   const cell = (containerWidth - gap * (cols - 1)) / cols;
