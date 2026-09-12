@@ -211,6 +211,7 @@ function drawWeeksGrid(stats) {
   const canvas = document.getElementById("weeks-canvas");
   const gap = 2;
   const cols = 52;
+  const marginCols = 2; // blank margin on each side, sized as "N grid columns" so it scales with the cells themselves
   const rows = stats.targetAgeYears;
   // The canvas bleeds edge-to-edge via a matching negative margin in CSS
   // (margin-inline: -var(--space-5)), cancelling out .years-section's own
@@ -224,7 +225,13 @@ function drawWeeksGrid(stats) {
   const containerWidth = canvas.parentElement.clientWidth;
   if (containerWidth <= 0) return;
 
-  const cell = (containerWidth - gap * (cols - 1)) / cols;
+  // Solve cell size treating the two margins as extra "columns" (cols + 2 *
+  // marginCols total units sharing the gaps between real columns), so the
+  // left/right margin is always exactly marginCols cells wide regardless of
+  // viewport size — a margin proportional to the grid itself, not a fixed
+  // pixel value unrelated to it.
+  const cell = (containerWidth - gap * (cols - 1)) / (cols + marginCols * 2);
+  const margin = cell * marginCols;
   const cssWidth = containerWidth;
   const cssHeight = rows * cell + gap * (rows - 1);
   const ctx = sizeCanvasForDPR(canvas, cssWidth, cssHeight);
@@ -242,7 +249,7 @@ function drawWeeksGrid(stats) {
   for (let i = 0; i < totalWeeks; i++) {
     const col = i % cols;
     const row = Math.floor(i / cols);
-    const x = col * (cell + gap);
+    const x = margin + col * (cell + gap);
     const y = row * (cell + gap);
     ctx.beginPath();
     roundRectPath(ctx, x, y, cell, cell, radius);
