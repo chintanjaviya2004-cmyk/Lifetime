@@ -638,7 +638,13 @@ input[type="date"]:focus {
 
 .weeks-canvas {
   display: block;
-  width: 100%;
+  /* Bleeds to the section's outer edge (cancelling out .years-section's own
+     side padding) so each week cell gets a bit more room — the grid reads
+     noticeably "bigger" without changing the 52-columns-per-year layout.
+     No `width` here: app.js always sets an explicit pixel width inline
+     (canvas is a replaced element, so `width:auto`/`100%` doesn't reliably
+     fill its container the way it does for a plain block element). */
+  margin-inline: calc(-1 * var(--space-5));
 }
 .weeks-canvas[hidden] {
   display: none;
