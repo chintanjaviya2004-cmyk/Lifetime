@@ -112,6 +112,7 @@ export function computeLifeStats(birthdateISO, targetAgeYears = 60, now = new Da
     rank: rankFor(percentLived),
     rankIndex: rankIndexFor(percentLived),
     narrative: narrativeFor(percentLived),
+    endTimestamp: end.getTime(),
     yearsLived,
     targetAgeYears,
   };

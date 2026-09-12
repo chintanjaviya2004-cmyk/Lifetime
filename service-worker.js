@@ -1,7 +1,7 @@
 // Cache-first: everything here is static and all data is computed client-side
 // from localStorage, so there's nothing dynamic to invalidate.
 // Bump this on every release to evict the old cache.
-const CACHE_NAME = "lifetime-v3";
+const CACHE_NAME = "lifetime-v5";
 
 const PRECACHE_URLS = [
   "./",

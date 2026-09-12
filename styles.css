@@ -273,10 +273,17 @@ input[type="date"]:focus {
 /* ---------- header ---------- */
 
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-5) var(--space-5) 0;
+  padding: var(--space-5);
+  background: rgba(10, 14, 20, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
 }
 
 .brand { display: flex; align-items: center; gap: var(--space-2); }
@@ -423,6 +430,74 @@ input[type="date"]:focus {
   color: var(--accent);
 }
 .hero.overtime .rank-label { color: var(--amber); }
+
+.seconds-hero {
+  margin: var(--space-7) auto 0;
+  text-align: center;
+}
+
+.seconds-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(57, 255, 136, 0.8);
+  animation: live-blink 2s ease-in-out infinite;
+}
+.hero.overtime .live-dot {
+  background: var(--amber);
+  box-shadow: 0 0 6px rgba(255, 176, 32, 0.8);
+}
+@keyframes live-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}
+
+.seconds-value {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  /* Sized for the worst case (a long custom life-expectancy can push this
+     past 1 billion seconds, ~13 characters incl. commas) so it never
+     needs to wrap or overflow at phone widths — kept deliberately
+     conservative since this must also survive a brief render with a
+     fallback font before the webfont finishes loading. */
+  font-size: clamp(22px, 6.8vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  text-shadow: 0 0 26px rgba(57, 255, 136, 0.45);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.hero.overtime .seconds-value {
+  color: var(--amber);
+  text-shadow: 0 0 26px rgba(255, 176, 32, 0.45);
+}
+
+.seconds-sub {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
 
 .narrative-line {
   margin: var(--space-6) 0 0;

@@ -38,8 +38,10 @@ const rankUpTitle = document.getElementById("rank-up-title");
 const rankUpDismiss = document.getElementById("rank-up-dismiss");
 
 let lastStats = null;
+let liveClockTimer = null;
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
+const pad2 = (n) => String(n).padStart(2, "0");
 
 function validateBirthdate(value) {
   if (!value) return "Enter a date to continue.";
@@ -372,6 +374,36 @@ importDataInput.addEventListener("change", async () => {
   }
 });
 
+// ---------- live ticking clock (total seconds, the main event) ----------
+
+const liveSecondsEl = document.getElementById("live-seconds");
+const secondsLabelTextEl = document.getElementById("seconds-label-text");
+const liveSubEl = document.getElementById("live-sub");
+
+function updateLiveClock(endTimestamp) {
+  const now = Date.now();
+  const isPast = now >= endTimestamp;
+  const diffMs = Math.abs(endTimestamp - now);
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  liveSecondsEl.textContent = totalSeconds.toLocaleString();
+  secondsLabelTextEl.textContent = isPast ? "SECONDS OVER" : "SECONDS LEFT";
+  liveSubEl.textContent = `${days.toLocaleString()} days · ${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+}
+
+// Ticks every second directly off the absolute end timestamp (never
+// accumulates a running total), so background-tab throttling just means a
+// jump to the correct value on the next tick rather than any drift.
+function startLiveClock(endTimestamp) {
+  clearInterval(liveClockTimer);
+  updateLiveClock(endTimestamp);
+  liveClockTimer = setInterval(() => updateLiveClock(endTimestamp), 1000);
+}
+
 // ---------- dashboard render ----------
 
 function renderDashboard() {
@@ -381,6 +413,7 @@ function renderDashboard() {
   lastStats = stats;
 
   document.querySelector(".hero").classList.toggle("overtime", stats.isPast);
+  startLiveClock(stats.endTimestamp);
 
   const clampedPct = Math.min(100, stats.percentLived);
   const ringWrap = document.getElementById("ring-wrap");
